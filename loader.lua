@@ -23,14 +23,6 @@ GlobalEnv.Import = function(path)
     return func()
 end
 
-GlobalEnv.Library = GlobalEnv.Import("lib/ImGui.lua")
-GlobalEnv.HubWindow = GlobalEnv.Import("lib/Window.lua")
-
-local SettingsTab = GlobalEnv.HubWindow:CreateTab({
-    Name = "Settings"
-})
-local SettingsRegion = CreateRegion(SettingsTab, "Settings")
-
 if not GlobalEnv.Library then
     return warn("❌ Library gagal dimuat. Script berhenti.")
 end
@@ -38,6 +30,7 @@ end
 local Games = {
     ["test"] = "src/test.lua",
     [123456789] = "src/SuperSoldier.lua",
+    [133815151] = "src/TheFinalStand.lua",
 }
 
 if Games[PlaceID] then
