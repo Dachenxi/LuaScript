@@ -40,25 +40,6 @@ local Window = ReGui:Window({
 	Size = UDim2.new(0, 600, 0, 400),
 }):Center()
 
-local ModalWindow = Window:PopupModal({
-	Title = "Modal Example",
-	AutoSize = "Y"
-})
-
-ModalWindow:Label({
-	Text = [[Hello, this is a modal. 
-Thank you for using Depso's ReGui 😁]],
-	TextWrapped = true
-})
-ModalWindow:Separator()
-
-ModalWindow:Button({
-	Text = "Okay",
-	Callback = function()
-		ModalWindow:ClosePopup()
-	end,
-})
-
 local Group = Window:List({
 	UiPadding = 2,
 	HorizontalFlex = Enum.UIFlexAlignment.Fill,
