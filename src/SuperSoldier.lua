@@ -2,7 +2,6 @@ local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local Workspace = game:GetService("Workspace")
 local Players = game:GetService("Players")
-lib/ImGui.lua
 local Camera = Workspace.CurrentCamera
 local LocalPlayer = Players.LocalPlayer
 local CharactersFolder = Workspace:FindFirstChild("Characters")

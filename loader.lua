@@ -1,31 +1,43 @@
+local GlobalEnv = (getgenv and getgenv()) or _G
 local PlaceID = game.PlaceId
-local RepoURL = "https://raw.githubusercontent.com/Dachenxi/LuaScript/main/"
-getgenv().Import = function(path)
-    local url = RepoURL .. path
+local BaseURL = "https://raw.githubusercontent.com/Dachenxi/LuaScript/main/"
+
+GlobalEnv.Import = function(path)
+    local url = BaseURL .. path .. "?t=" .. tostring(os.time())
+
     local success, result = pcall(function()
         return game:HttpGet(url)
     end)
-    
-    if success then
-        local func = loadstring(result)
-        return func()
-    else
-        warn("Gagal mengambil file: " .. path)
+
+    if not success or result == "404: Not Found" then
+        warn("⚠️ Gagal mengambil file: " .. path)
         return nil
     end
+
+    local func, err = loadstring(result)
+    if not func then
+        warn("⚠️ Syntax Error di " .. path .. ": " .. tostring(err))
+        return nil
+    end
+
+    return func()
 end
 
-getgenv().Library = Import("lib/ImGui.lua")
-getgenv().ESP_Lib = Import("lib/ESP.lua")
+GlobalEnv.Library = GlobalEnv.Import("lib/ImGui.lua")
+
+if not GlobalEnv.Library then
+    return warn("❌ Library gagal dimuat. Script berhenti.")
+end
 
 local Games = {
     ["test"] = "src/test.lua",
-    [123456789] = "src/SuperSoldier.lua",  -- Ganti 123456789 dengan PlaceID game yang diinginkan
+    [123456789] = "src/SuperSoldier.lua",
 }
 
 if Games[PlaceID] then
-    print("Game Terdeteksi! Loading script...")
-    Import(Games[PlaceID])
+    print("✅ Game Terdeteksi! Loading script...")
+    GlobalEnv.Import(Games[PlaceID])
 else
-    Import("src/Default.lua")
+    print("ℹ️ Game tidak terdaftar. Loading Default...")
+    GlobalEnv.Import("src/test.lua") 
 end
