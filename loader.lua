@@ -24,6 +24,12 @@ GlobalEnv.Import = function(path)
 end
 
 GlobalEnv.Library = GlobalEnv.Import("lib/ImGui.lua")
+GlobalEnv.HubWindow = GlobalEnv.Import("lib/Window.lua")
+
+local SettingsTab = GlobalEnv.HubWindow:CreateTab({
+    Name = "Settings"
+})
+local SettingsRegion = CreateRegion(SettingsTab, "Settings")
 
 if not GlobalEnv.Library then
     return warn("❌ Library gagal dimuat. Script berhenti.")
