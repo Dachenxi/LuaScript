@@ -1,4 +1,4 @@
-local RunService = game:GetService("RunService")
+local GlobalEnv = (getgenv and getgenv()) or _G
 
 local ReGui = loadstring(game:HttpGet('https://raw.githubusercontent.com/depthso/Dear-ReGui/refs/heads/main/ReGui.lua'))()
 ReGui:DefineTheme("Blue", {
@@ -26,9 +26,7 @@ ReGui:DefineTheme("Blue", {
 	ResizeGrab = Color3.fromRGB(50, 45, 50),
 	RegionBgTransparency = 1,
 })
-
 local Window = ReGui:Window({
-	Title = "Free Script Hub",
 	Theme = "Blue",
 	Size = UDim2.new(0, 600, 0, 400),
 }):Center()
@@ -122,3 +120,7 @@ local function LoadSettingsTab(WindowsTabs)
 		end
 	})		
 end
+
+GlobalEnv.HubWindow = Window
+
+return ReGui

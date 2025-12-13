@@ -1,6 +1,4 @@
 local GlobalEnv = (getgenv and getgenv()) or _G
-local ReGui = GlobalEnv.Library
-if not ReGui then return print("Library belum ke-load!") end
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local Workspace = game:GetService("Workspace")
@@ -30,10 +28,7 @@ FOVCircle.Radius = FOV_Radius
 FOVCircle.Position = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
 FOVCircle.Visible = false
 
-local Window = ReGui:TabsWindow({
-    Title = "Zombie Destroyer (Triggerbot)",
-    Size = UDim2.fromOffset(420, 560) -- Ukuran diperbesar sedikit
-})
+local Window = GlobalEnv.HubWindow
 
 local MainTab = Window:CreateTab({"Main", 12099513436})
 local AimbotRegion = MainTab:CreateRegion({MainTab, "Aimbot Settings"})
