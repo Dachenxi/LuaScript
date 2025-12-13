@@ -26,7 +26,7 @@ end
 GlobalEnv.Library = GlobalEnv.Import("src/ReGui.lua")
 local Games = {
     [123456789] = "src/SuperSoldier.lua",
-    [133815151] = "src/TheFinalStand.lua",
+    [1103751037] = "src/TheFinalStand.lua",
 }
 
 if Games[PlaceID] then
