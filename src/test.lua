@@ -88,8 +88,6 @@ EspRegion:DragColor3({
     Callback = function(self, val) HighlightFillColor = val end
 })
 
-GlobalEnv.Library:LoadSettingsTab(Window)
-
 local function GetTargetPart(model)
     local head = model:FindFirstChild("Head")
     if head then return head end

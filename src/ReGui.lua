@@ -111,38 +111,6 @@ local function CreateRegion(Parent, Title)
     return Region
 end
 
--- 5. TAB SETTINGS (DEFAULT)
-local SettingsContent = CreateTab("Settings", 7734053495) -- Icon Gear
-local SettingsRegion = CreateRegion(SettingsContent, "Interface")
-
-SettingsRegion:Combo({
-    Label = "Theme",
-    Selected = Window.Theme,
-    Items = ReGui:GetThemeNames(),
-    Callback = function(self, val)
-        Window:SetTheme(val)
-    end
-})
-
-SettingsRegion:SliderFloat({
-    Label = "Transparency",
-    Minimum = 0.0, Maximum = 1.0, Value = Window.Transparency, Format = "%.2f",
-    Callback = function(self, val)
-        Window.Transparency = val
-    end
-})
-
-SettingsRegion:Button({
-    Text = "Unload Script",
-    Callback = function()
-        -- Hapus UI dari layar
-        if game:GetService("CoreGui"):FindFirstChild("DearReGui") then
-            game:GetService("CoreGui").DearReGui:Destroy()
-        end
-    end
-})
-
-
 -- 6. PACKAGING (MENYIAPKAN UNTUK EXPORT)
 -- Kita buat table API khusus
 local UI_API = {
