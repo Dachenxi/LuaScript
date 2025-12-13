@@ -28,87 +28,76 @@ ReGui:DefineTheme("Blue", {
 
 -- 2. CREATE WINDOW
 local Window = ReGui:Window({
+	Title = "Hub Script",
     Theme = "Blue",
     Size = UDim2.new(0, 600, 0, 400),
 }):Center()
 
--- 3. LAYOUTING (SIDEBAR SYSTEM)
 local Group = Window:List({
-    UiPadding = 2,
-    HorizontalFlex = Enum.UIFlexAlignment.Fill,
-    FillDirection = Enum.FillDirection.Horizontal -- Penting: Biar sidebar di kiri, konten di kanan
+	UiPadding = 2,
+	HorizontalFlex = Enum.UIFlexAlignment.Fill,
 })
 
 local TabsBar = Group:List({
-    Border = true,
-    UiPadding = 5,
-    BorderColor = Window:GetThemeKey("Border"),
-    BorderThickness = 1,
-    HorizontalFlex = Enum.UIFlexAlignment.Fill,
-    HorizontalAlignment = Enum.HorizontalAlignment.Center,
-    AutomaticSize = Enum.AutomaticSize.None,
-    FlexMode = Enum.UIFlexMode.None,
-    Size = UDim2.new(0, 50, 1, 0), -- Lebar sidebar sedikit diperbesar
-    CornerRadius = UDim.new(0, 5)
+	Border = true,
+	UiPadding = 5,
+	BorderColor = Window:GetThemeKey("Border"),
+	BorderThickness = 1,
+	HorizontalFlex = Enum.UIFlexAlignment.Fill,
+	HorizontalAlignment = Enum.HorizontalAlignment.Center,
+	AutomaticSize = Enum.AutomaticSize.None,
+	FlexMode = Enum.UIFlexMode.None,
+	Size = UDim2.new(0, 40, 1, 0),
+	CornerRadius = UDim.new(0, 5)
 })
-
 local TabSelector = Group:TabSelector({
-    NoTabsBar = true,
-    Size = UDim2.fromScale(1, 1), -- Mengisi sisa ruang
-    FlexMode = Enum.UIFlexMode.Fill -- Penting agar konten mengisi ruang kosong
+	NoTabsBar = true,
+	Size = UDim2.fromScale(0.5, 1)
 })
 
--- 4. HELPER FUNCTIONS (API KITA)
+local function CreateTab(Name: string, Icon)
+	local Tab = TabSelector:CreateTab({
+		Name = Name
+	})
 
--- Fungsi untuk membuat Tab dengan Icon
-local function CreateTab(Name, Icon)
-    local Tab = TabSelector:CreateTab({
-        Name = Name
-    })
+	local List = Tab:List({
+		HorizontalFlex = Enum.UIFlexAlignment.Fill,
+		UiPadding = 1,
+		Spacing = 10
+	})
 
-    -- Container utama di dalam tab
-    local List = Tab:List({
-        HorizontalFlex = Enum.UIFlexAlignment.Fill,
-        UiPadding = 8,
-        Spacing = 10
-    })
+	local Button = TabsBar:Image({
+		Image = Icon,
+		Ratio = 1,
+		RatioAxis = Enum.DominantAxis.Width,
+		Size = UDim2.fromScale(1, 1),
+		Callback = function(self)
+			TabSelector:SetActiveTab(Tab)
+		end,
+	})
 
-    -- Tombol Icon di Sidebar
-    local Button = TabsBar:Image({
-        Image = Icon,
-        Ratio = 1,
-        RatioAxis = Enum.DominantAxis.Width,
-        Size = UDim2.fromScale(1, 0),
-        Callback = function(self)
-            TabSelector:SetActiveTab(Tab)
-        end,
-    })
+	ReGui:SetItemTooltip(Button, function(Canvas)
+		Canvas:Label({
+			Text = Name
+		})
+	end)
 
-    -- Tooltip saat hover icon
-    ReGui:SetItemTooltip(Button, function(Canvas)
-        Canvas:Label({ Text = Name })
-    end)
-
-    return List -- Kita return 'List' agar elemen UI dimasukkan ke sini
+	return List
 end
 
--- Fungsi untuk membuat Region (Kotak Group)
 local function CreateRegion(Parent, Title)
-    local Region = Parent:Region({
-        Border = true,
-        BorderColor = Window:GetThemeKey("Border"),
-        BorderThickness = 1,
-        CornerRadius = UDim.new(0, 5),
-        UiPadding = 10
-    })
-    
-    -- Header Region
-    if Title then
-        Region:Label({ Text = Title })
-        Region:Separator()
-    end
+	local Region = Parent:Region({
+		Border = true,
+		BorderColor = Window:GetThemeKey("Border"),
+		BorderThickness = 1,
+		CornerRadius = UDim.new(0, 5)
+	})
 
-    return Region
+	Region:Label({
+		Text = Title
+	})
+
+	return Region
 end
 
 local UI_API = {
