@@ -28,12 +28,12 @@ FOVCircle.Radius = FOV_Radius
 FOVCircle.Position = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
 FOVCircle.Visible = false
 
-local Window = GlobalEnv.HubWindow
+local UI = GlobalEnv.Library
 
-local MainTab = Window:CreateTab({"Main", 12099513436})
-local AimbotRegion = MainTab:CreateRegion({MainTab, "Aimbot Settings"})
-local TriggerBotRegion = MainTab:CreateRegion({MainTab, "Triggerbot Settings"})
-local EspRegion = MainTab:CreateRegion({MainTab, "ESP Settings"})
+local MainTab = UI.CreateTab({"Main", 12099513436})
+local AimbotRegion = MainTab.CreateRegion({MainTab, "Aimbot Settings"})
+local TriggerBotRegion = MainTab.CreateRegion({MainTab, "Triggerbot Settings"})
+local EspRegion = MainTab.CreateRegion({MainTab, "ESP Settings"})
 
 AimbotRegion:Checkbox({
     Label = "Enable Aimbot",
