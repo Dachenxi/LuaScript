@@ -1,6 +1,6 @@
 local GlobalEnv = (getgenv and getgenv()) or _G
 local ReGui = GlobalEnv.Library
-
+if not ReGui then return print("Library belum ke-load!") end
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local Workspace = game:GetService("Workspace")
