@@ -30,7 +30,6 @@ ReGui:DefineTheme("Blue", {
 local Window = ReGui:Window({
 	Title = "Free Script Hub",
 	Theme = "Blue",
-	NoClose = true,
 	Size = UDim2.new(0, 600, 0, 400),
 }):Center()
 
