@@ -31,10 +31,11 @@ FOVCircle.Visible = false
 local UI = GlobalEnv.Library
 if not UI then return warn("UI belum dimuat!") end
 
-local MainTab = UI.CreateTab("Main", 12099513436)
-local AimbotRegion = UI.CreateRegion(MainTab, "Aimbot Settings")
-local TriggerBotRegion = UI.CreateRegion(MainTab, "Triggerbot Settings")
-local EspRegion = UI.CreateRegion(MainTab, "ESP Settings")
+local CombatTab = UI.CreateTab("Main", "rbxassetid://12099513436")
+local AimbotRegion = UI.CreateRegion(CombatTab, "Aimbot Settings")
+local TriggerBotRegion = UI.CreateRegion(CombatTab, "Triggerbot Settings")
+local EspTab = UI.CreateTab("ESP", "rbxassetid://12099513436")
+local EspRegion = UI.CreateRegion(EspTab, "ESP Settings")
 
 AimbotRegion:Checkbox({
     Label = "Enable Aimbot",

@@ -100,11 +100,19 @@ local function CreateRegion(Parent, Title)
 	return Region
 end
 
+local function SettingTabs(Window)
+	local SettingsTab = CreateTab("Settings", "rbxassetid://13748247112")
+
+	local SettingsRegion = CreateRegion(SettingsTab, "Settings")
+	
+end
+
 local UI_API = {
     Window = Window,     
     Library = ReGui, 
     CreateTab = CreateTab,
-    CreateRegion = CreateRegion 
+    CreateRegion = CreateRegion,
+	LoadSettingsTab = SettingTabs,
 }
 
 GlobalEnv.HubWindow = UI_API 
