@@ -112,7 +112,7 @@ local function CreateRegion(Parent, Title)
 end
 
 -- 5. TAB SETTINGS (DEFAULT)
-local SettingsContent = CreateTab("Settings", "rbxassetid://7734053495") -- Icon Gear
+local SettingsContent = CreateTab("Settings", 7734053495) -- Icon Gear
 local SettingsRegion = CreateRegion(SettingsContent, "Interface")
 
 SettingsRegion:Combo({
