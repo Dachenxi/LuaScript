@@ -29,6 +29,7 @@ FOVCircle.Position = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.
 FOVCircle.Visible = false
 
 local UI = GlobalEnv.Library
+if not UI then return warn("UI belum dimuat!") end
 
 local MainTab = UI.CreateTab({"Main", 12099513436})
 local AimbotRegion = MainTab.CreateRegion({MainTab, "Aimbot Settings"})
