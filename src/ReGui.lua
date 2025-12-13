@@ -75,10 +75,10 @@ local function CreateTab(Name, Icon)
 
     -- Tombol Icon di Sidebar
     local Button = TabsBar:Image({
-        Image = Icon or "rbxassetid://7734068321", -- Default Icon (Kotak)
+        Image = Icon,
         Ratio = 1,
         RatioAxis = Enum.DominantAxis.Width,
-        Size = UDim2.fromScale(1, 0), -- Tinggi otomatis ikut ratio
+        Size = UDim2.fromScale(1, 0),
         Callback = function(self)
             TabSelector:SetActiveTab(Tab)
         end,
