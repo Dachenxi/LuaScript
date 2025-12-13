@@ -1,3 +1,4 @@
+
 local GlobalEnv = (getgenv and getgenv()) or _G
 local PlaceID = game.PlaceId
 local BaseURL = "https://raw.githubusercontent.com/Dachenxi/LuaScript/main/"
@@ -22,13 +23,8 @@ GlobalEnv.Import = function(path)
 
     return func()
 end
-
-if not GlobalEnv.Library then
-    return warn("❌ Library gagal dimuat. Script berhenti.")
-end
-
+GlobalEnv.Library = GlobalEnv.Import("src/ReGui.lua")
 local Games = {
-    ["test"] = "src/test.lua",
     [123456789] = "src/SuperSoldier.lua",
     [133815151] = "src/TheFinalStand.lua",
 }

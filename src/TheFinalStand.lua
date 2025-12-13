@@ -1,7 +1,6 @@
--- === LOAD LIBRARY REGUI ===
-local ReGui = loadstring(game:HttpGet('https://raw.githubusercontent.com/depthso/Dear-ReGui/refs/heads/main/ReGui.lua'))()
+local GlobalEnv = (getgenv and getgenv()) or _G
+local ReGui = GlobalEnv.Library
 
--- === SERVICES ===
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local Workspace = game:GetService("Workspace")
@@ -9,24 +8,20 @@ local Players = game:GetService("Players")
 
 local Camera = Workspace.CurrentCamera
 local ZombiesFolder = Workspace:FindFirstChild("Zombies")
+local LocalPlayer = Players.LocalPlayer
 
--- === CONFIG VARIABLES ===
 local AimbotEnabled = false
 local Aiming = false
-local AimMethod = "Mouse" -- Default: Mouse
+local AimMethod = "Mouse"
 local FOV_Radius = 150
-local Smoothness = 3 -- Hanya berpengaruh pada mode Mouse
+local Smoothness = 3
 
--- Hitbox
-local HitboxEnabled = false
-local HitboxSize = 5 
-local HitboxTransparency = 0.7
+local TriggerbotEnabled = false
+local IsShooting = false -- Status apakah sedang nembak
 
--- Visuals
 local HighlightEnabled = false
 local HighlightFillColor = Color3.fromRGB(255, 0, 0)
 
--- === VISUAL FOV ===
 local FOVCircle = Drawing.new("Circle")
 FOVCircle.Color = Color3.fromRGB(255, 255, 255)
 FOVCircle.Thickness = 1
@@ -35,35 +30,34 @@ FOVCircle.Radius = FOV_Radius
 FOVCircle.Position = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
 FOVCircle.Visible = false
 
--- === UI SETUP ===
 local Window = ReGui:TabsWindow({
-    Title = "Zombie Destroyer (CFrame & Mouse)",
-    Size = UDim2.fromOffset(420, 520)
+    Title = "Zombie Destroyer (Triggerbot)",
+    Size = UDim2.fromOffset(420, 560) -- Ukuran diperbesar sedikit
 })
 
 local MainTab = Window:CreateTab({ Name = "Main" })
 
--- Label
 MainTab:Label({ Text = "Aimbot Configuration" })
 
--- Toggle Aimbot
 MainTab:Checkbox({
     Label = "Enable Aimbot",
     Value = AimbotEnabled,
     Callback = function(self, bool) AimbotEnabled = bool; FOVCircle.Visible = bool end
 })
 
--- [BARU] COMBO BOX PILIH METODE
+MainTab:Checkbox({
+    Label = "Triggerbot (Auto Shoot)",
+    Value = TriggerbotEnabled,
+    Callback = function(self, bool)
+        TriggerbotEnabled = bool
+    end
+})
+
 MainTab:Combo({
     Label = "Aim Method",
     Selected = AimMethod,
-    Items = {
-        "Mouse",
-        "CFrame"
-    },
-    Callback = function(self, val)
-        AimMethod = val
-    end
+    Items = { "Mouse", "CFrame" },
+    Callback = function(self, val) AimMethod = val end
 })
 
 MainTab:SliderInt({
@@ -80,12 +74,11 @@ MainTab:SliderFloat({
 
 MainTab:Separator()
 
--- Toggle ESP
 MainTab:Checkbox({
     Label = "Highlight ESP",
     Value = HighlightEnabled,
-    Callback = function(self, bool) 
-        HighlightEnabled = bool 
+    Callback = function(self, bool)
+        HighlightEnabled = bool
         if not bool and ZombiesFolder then
             for _, v in pairs(ZombiesFolder:GetDescendants()) do
                 if v.Name == "ZenythHighlight" then v:Destroy() end
@@ -97,30 +90,23 @@ MainTab:Checkbox({
 MainTab:DragColor3({
     Label = "ESP Color",
     Value = HighlightFillColor,
-    Callback = function(self, val)
-        HighlightFillColor = val
-    end
+    Callback = function(self, val) HighlightFillColor = val end
 })
 
 local function GetTargetPart(model)
-    local head = model:FindFirstChild("Head") 
+    local head = model:FindFirstChild("Head")
     if head then return head end
-    
     local torso = model:FindFirstChild("Torso") or model:FindFirstChild("UpperTorso") or model:FindFirstChild("HumanoidRootPart")
     if torso then return torso end
-    
-    -- Fallback terakhir: Ambil part apapun
     for _, child in ipairs(model:GetChildren()) do
         if child:IsA("BasePart") then return child end
     end
     return nil
 end
 
--- === CORE LOGIC ===
 RunService.RenderStepped:Connect(function()
     if not ZombiesFolder then ZombiesFolder = Workspace:FindFirstChild("Zombies") end
-    
-    -- Update FOV Circle
+
     FOVCircle.Position = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
     FOVCircle.Radius = FOV_Radius
     FOVCircle.Visible = AimbotEnabled
@@ -131,21 +117,13 @@ RunService.RenderStepped:Connect(function()
     local shortestDist = math.huge
     local mousePos = UserInputService:GetMouseLocation()
 
-    -- SCAN ZOMBIES
     for _, zombie in ipairs(ZombiesFolder:GetChildren()) do
         if zombie:IsA("Model") then
-            
+
             local targetPart = GetTargetPart(zombie)
 
             if targetPart then
-                -- 1. HITBOX
-                if HitboxEnabled then
-                    targetPart.Size = Vector3.new(HitboxSize, HitboxSize, HitboxSize)
-                    targetPart.Transparency = HitboxTransparency
-                    targetPart.CanCollide = false
-                end
 
-                -- 2. HIGHLIGHT ESP
                 if HighlightEnabled then
                     local hl = zombie:FindFirstChild("ZenythHighlight")
                     if not hl then
@@ -159,7 +137,6 @@ RunService.RenderStepped:Connect(function()
                     hl.FillColor = HighlightFillColor
                 end
 
-                -- 3. CARI TARGET TERDEKAT
                 if AimbotEnabled then
                     local screenPos, onScreen = Camera:WorldToViewportPoint(targetPart.Position)
                     if onScreen then
@@ -174,28 +151,43 @@ RunService.RenderStepped:Connect(function()
         end
     end
 
-    -- === EKSEKUSI AIMBOT BERDASARKAN METODE ===
+    if TriggerbotEnabled then
+        local rayOrigin = Camera.CFrame.Position
+        local rayDirection = Camera.CFrame.LookVector * 1000
+
+        local params = RaycastParams.new()
+        params.FilterType = Enum.RaycastFilterType.Exclude
+        params.FilterDescendantsInstances = {LocalPlayer.Character, Camera, Workspace:FindFirstChild("Ignore")}
+
+        local result = Workspace:Raycast(rayOrigin, rayDirection, params)
+
+        if result and result.Instance and result.Instance:IsDescendantOf(ZombiesFolder) then
+            if not IsShooting then
+                mouse1press()
+                IsShooting = true
+            end
+        else
+            if IsShooting then
+                mouse1release()
+                IsShooting = false
+            end
+        end
+    end
+
     if AimbotEnabled and Aiming and bestTarget then
-        
-        -- METODE 1: CFrame (Camera Lock - Hard/Kasar)
         if AimMethod == "CFrame" then
             Camera.CFrame = CFrame.new(Camera.CFrame.Position, bestTarget.Position)
-        
-        -- METODE 2: Mouse (Movement - Smooth/Halus)
         elseif AimMethod == "Mouse" then
             local pos = Camera:WorldToViewportPoint(bestTarget.Position)
             local dx = (pos.X - mousePos.X) / Smoothness
             local dy = (pos.Y - mousePos.Y) / Smoothness
-            
             if mousemoverel then
                 mousemoverel(dx, dy)
             end
         end
-        
     end
 end)
 
--- INPUT HANDLING
 UserInputService.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton2 then Aiming = true end
 end)
