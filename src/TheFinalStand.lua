@@ -31,7 +31,7 @@ FOVCircle.Visible = false
 local UI = GlobalEnv.Library
 if not UI then return warn("UI belum dimuat!") end
 
-local CombatTab = UI.CreateTab("Main", 12099513436)
+local CombatTab = UI.CreateTab("Main", 139650104834071)
 local AimbotRegion = UI.CreateRegion(CombatTab, "Aimbot Settings")
 local EspTab = UI.CreateTab("ESP", 12099513436)
 local EspRegion = UI.CreateRegion(EspTab, "ESP Settings")
