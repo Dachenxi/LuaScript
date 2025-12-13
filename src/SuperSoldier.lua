@@ -1,9 +1,11 @@
 local GlobalEnv = (getgenv and getgenv()) or _G
 local UI = GlobalEnv.Library
 
+if not UI then return warn("Library UI belum dimuat!") end
+
 -- Buat Tab & Region
 local CombatTab = UI.CreateTab("Main", 12099513436)
-local HitboxRegion = UI.CreateRegion(CombatTab, "Hitbox Settings") -- Ganti nama region
+local HitboxRegion = UI.CreateRegion(CombatTab, "Hitbox & Bring") 
 local EspTab = UI.CreateTab("ESP", 12099513436)
 local EspRegion = UI.CreateRegion(EspTab, "ESP Settings")
 
@@ -21,9 +23,12 @@ local LocalPlayer = Players.LocalPlayer
 --#region Settings Variables
 -- Settings Hitbox
 local HitboxEnabled = false
-local HitboxSize = 5 -- Ukuran default hitbox
+local HitboxSize = 5 
 local HitboxTransparency = 0.7
-local TargetPartName = "HumanoidRootPart" -- Bagian yg diperbesar (RootPart lebih stabil)
+
+-- Settings Bring Mobs
+local BringEnabled = false
+local BringDistance = 5 
 
 -- Settings ESP
 local HighlightEnabled = false
@@ -37,7 +42,6 @@ HitboxRegion:Checkbox({
     Value = HitboxEnabled,
     Callback = function(self, bool)
         HitboxEnabled = bool
-        -- Jika dimatikan, kita perlu mereset size NPC di loop nanti
     end
 })
 
@@ -50,10 +54,30 @@ HitboxRegion:SliderInt({
 })
 
 HitboxRegion:SliderFloat({
-    Label = "Transparency",
+    Label = "Hitbox Transparency",
     Minimum = 0.1, Maximum = 1.0, Value = HitboxTransparency, Format = "%.1f",
     Callback = function(self, val)
         HitboxTransparency = val
+    end
+})
+
+HitboxRegion:Separator()
+HitboxRegion:Label({Text = "Bring Mobs Feature"})
+
+HitboxRegion:Checkbox({
+    Label = "Enable Bring Mobs",
+    Value = BringEnabled,
+    Callback = function(self, bool)
+        BringEnabled = bool
+        -- Reset Massless jika dimatikan (Optional, biasanya dibiarkan saja tidak apa-apa)
+    end
+})
+
+HitboxRegion:SliderInt({
+    Label = "Bring Distance",
+    Minimum = 2, Maximum = 15, Value = BringDistance,
+    Callback = function(self, val)
+        BringDistance = val
     end
 })
 
@@ -62,7 +86,6 @@ EspRegion:Checkbox({
     Value = HighlightEnabled,
     Callback = function(self, bool)
         HighlightEnabled = bool
-        -- Cleanup saat dimatikan
         if not bool and NPCContainer then
             for _, npc in pairs(NPCContainer:GetChildren()) do
                 local hl = npc:FindFirstChild("ZenythHighlight")
@@ -82,12 +105,10 @@ EspRegion:DragColor3({
 -- LOGIC FUNCTIONS
 -- =================================================================
 
--- Fungsi untuk mendapatkan bagian yang mau diperbesar
 local function GetHitboxPart(model)
-    return model:FindFirstChild("Head")
+    return model:FindFirstChild("Head") or model:FindFirstChild("Torso")
 end
 
--- Validasi Target (Harus Hidup)
 local function IsValidTarget(model)
     if not model:IsA("Model") then return false end
     local humanoid = model:FindFirstChild("Humanoid")
@@ -102,27 +123,47 @@ end
 -- =================================================================
 
 RunService.RenderStepped:Connect(function()
-    -- Update Folder NPC jika hilang (misal ganti map/round)
     if not NPCContainer then 
         local engine = Workspace:FindFirstChild("NPC Engine")
         NPCContainer = engine and engine:FindFirstChild("NPCContainer")
         return 
     end
 
+    local Character = LocalPlayer.Character
+    local MyRoot = Character and Character:FindFirstChild("HumanoidRootPart")
+
     for _, npc in ipairs(NPCContainer:GetChildren()) do
         if IsValidTarget(npc) then
-            
-            -- === LOGIC HITBOX EXPANDER ===
             local hbPart = GetHitboxPart(npc)
+
             if hbPart then
+                
+                -- === LOGIC BRING MOBS + MASSLESS ===
+                if BringEnabled and MyRoot then
+                    -- 1. Teleport ke depan
+                    hbPart.CFrame = MyRoot.CFrame * CFrame.new(0, 0, -BringDistance)
+                    
+                    -- 2. Reset Velocity (Anti-Fling)
+                    hbPart.AssemblyLinearVelocity = Vector3.new(0,0,0)
+                    hbPart.AssemblyAngularVelocity = Vector3.new(0,0,0)
+                    
+                    -- 3. [BARU] MASSLESS & COLLISION
+                    -- Loop semua bagian tubuh musuh
+                    for _, part in pairs(npc:GetChildren()) do
+                        if part:IsA("BasePart") then
+                            part.Massless = true         -- Biar ringan (0 massa)
+                            part.CanCollide = false      -- Biar bisa nembus tembok/temennya
+                            part.Anchored = false        -- Pastikan tidak beku
+                        end
+                    end
+                end
+
+                -- === LOGIC HITBOX EXPANDER ===
                 if HitboxEnabled then
-                    -- Perbesar Ukuran
                     hbPart.Size = Vector3.new(HitboxSize, HitboxSize, HitboxSize)
                     hbPart.Transparency = HitboxTransparency
-                    hbPart.CanCollide = false -- Biar player tidak nabrak hitbox besar
+                    hbPart.CanCollide = false 
                 else
-                    -- Reset ke ukuran normal jika fitur dimatikan (tapi sebelumnya aktif)
-                    -- Ukuran normal HumanoidRootPart biasanya 2, 2, 1
                     if hbPart.Size.X == HitboxSize then 
                         hbPart.Size = Vector3.new(2, 2, 1) 
                         hbPart.Transparency = 1
