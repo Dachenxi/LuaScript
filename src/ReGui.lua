@@ -111,16 +111,13 @@ local function CreateRegion(Parent, Title)
     return Region
 end
 
--- 6. PACKAGING (MENYIAPKAN UNTUK EXPORT)
--- Kita buat table API khusus
 local UI_API = {
-    Window = Window,      -- Object window asli
-    Library = ReGui,      -- Library ReGui asli
-    CreateTab = CreateTab,       -- Fungsi custom tab kita
-    CreateRegion = CreateRegion  -- Fungsi custom region kita
+    Window = Window,     
+    Library = ReGui, 
+    CreateTab = CreateTab,
+    CreateRegion = CreateRegion 
 }
 
--- Simpan ke Global agar bisa diakses darimana saja
 GlobalEnv.HubWindow = UI_API 
 
 return UI_API

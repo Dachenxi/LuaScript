@@ -34,7 +34,8 @@ if not UI then return warn("UI belum dimuat!") end
 local MainTab = UI.CreateTab({"Main", 12099513436})
 local AimbotRegion = MainTab.CreateRegion({MainTab, "Aimbot Settings"})
 local TriggerBotRegion = MainTab.CreateRegion({MainTab, "Triggerbot Settings"})
-local EspRegion = MainTab.CreateRegion({MainTab, "ESP Settings"})
+local SettingsTab = UI.CreateTab({"Settings", 12099513436})
+local EspRegion = MainTab.CreateRegion({SettingsTab, "ESP Settings"})
 
 AimbotRegion:Checkbox({
     Label = "Enable Aimbot",
