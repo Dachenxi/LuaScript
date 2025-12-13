@@ -15,7 +15,7 @@ local FOV_Radius = 150
 local Smoothness = 3
 
 local TriggerbotEnabled = false
-local IsShooting = false -- Status apakah sedang nembak
+local IsShooting = false
 
 local HighlightEnabled = false
 local HighlightFillColor = Color3.fromRGB(255, 0, 0)
@@ -33,7 +33,6 @@ if not UI then return warn("UI belum dimuat!") end
 
 local CombatTab = UI.CreateTab("Main", 12099513436)
 local AimbotRegion = UI.CreateRegion(CombatTab, "Aimbot Settings")
-local TriggerBotRegion = UI.CreateRegion(CombatTab, "Triggerbot Settings")
 local EspTab = UI.CreateTab("ESP", 12099513436)
 local EspRegion = UI.CreateRegion(EspTab, "ESP Settings")
 
@@ -43,7 +42,7 @@ AimbotRegion:Checkbox({
     Callback = function(self, bool) AimbotEnabled = bool; FOVCircle.Visible = bool end
 })
 
-TriggerBotRegion:Checkbox({
+AimbotRegion:Checkbox({
     Label = "Triggerbot (Auto Shoot)",
     Value = TriggerbotEnabled,
     Callback = function(self, bool)
