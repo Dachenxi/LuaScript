@@ -1,6 +1,4 @@
 local GlobalEnv = (getgenv and getgenv()) or _G
-local ReGui = GlobalEnv.Library
-
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local Workspace = game:GetService("Workspace")
@@ -30,22 +28,22 @@ FOVCircle.Radius = FOV_Radius
 FOVCircle.Position = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
 FOVCircle.Visible = false
 
-local Window = ReGui:TabsWindow({
-    Title = "Zombie Destroyer (Triggerbot)",
-    Size = UDim2.fromOffset(420, 560) -- Ukuran diperbesar sedikit
-})
+local UI = GlobalEnv.Library
+if not UI then return warn("UI belum dimuat!") end
 
-local MainTab = Window:CreateTab({ Name = "Main" })
+local CombatTab = UI.CreateTab("Main", 12099513436)
+local AimbotRegion = UI.CreateRegion(CombatTab, "Aimbot Settings")
+local TriggerBotRegion = UI.CreateRegion(CombatTab, "Triggerbot Settings")
+local EspTab = UI.CreateTab("ESP", 12099513436)
+local EspRegion = UI.CreateRegion(EspTab, "ESP Settings")
 
-MainTab:Label({ Text = "Aimbot Configuration" })
-
-MainTab:Checkbox({
+AimbotRegion:Checkbox({
     Label = "Enable Aimbot",
     Value = AimbotEnabled,
     Callback = function(self, bool) AimbotEnabled = bool; FOVCircle.Visible = bool end
 })
 
-MainTab:Checkbox({
+TriggerBotRegion:Checkbox({
     Label = "Triggerbot (Auto Shoot)",
     Value = TriggerbotEnabled,
     Callback = function(self, bool)
@@ -53,28 +51,26 @@ MainTab:Checkbox({
     end
 })
 
-MainTab:Combo({
+AimbotRegion:Combo({
     Label = "Aim Method",
     Selected = AimMethod,
     Items = { "Mouse", "CFrame" },
     Callback = function(self, val) AimMethod = val end
 })
 
-MainTab:SliderInt({
+AimbotRegion:SliderInt({
     Label = "FOV Radius",
     Minimum = 50, Maximum = 800, Value = FOV_Radius,
     Callback = function(self, val) FOV_Radius = val end
 })
 
-MainTab:SliderFloat({
+AimbotRegion:SliderFloat({
     Label = "Smoothness (Mouse Only)",
     Minimum = 1.0, Maximum = 10.0, Value = Smoothness, Format = "%.1f",
     Callback = function(self, val) Smoothness = val end
 })
 
-MainTab:Separator()
-
-MainTab:Checkbox({
+EspRegion:Checkbox({
     Label = "Highlight ESP",
     Value = HighlightEnabled,
     Callback = function(self, bool)
@@ -87,7 +83,7 @@ MainTab:Checkbox({
     end
 })
 
-MainTab:DragColor3({
+EspRegion:DragColor3({
     Label = "ESP Color",
     Value = HighlightFillColor,
     Callback = function(self, val) HighlightFillColor = val end
