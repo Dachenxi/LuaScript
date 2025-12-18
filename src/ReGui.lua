@@ -144,7 +144,7 @@ function UI:CreateDefaultSettings()
 		Label = "Menu Toggle",
 		Value = Enum.KeyCode.RightShift,
 		Callback = function(self, key)
-			self.Window:SetVisible(not self.Window.Visible)
+			self.Window:SetVisible(self.Window, not self.Window.Visible)
 		end
 	})
 
