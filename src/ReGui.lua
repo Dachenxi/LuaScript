@@ -143,8 +143,9 @@ function UI:CreateDefaultSettings()
 	MainRegion:Keybind({
 		Label = "Menu Toggle",
 		Value = Enum.KeyCode.RightShift,
-		Callback = function(self, key)
-			self.Window:SetVisible(self.Window, not self.Window.Visible)
+		Callback = function(_, key)
+			local IsVisible = self.Window.Visible
+			self.Window:SetVisible(not IsVisible)
 		end
 	})
 
